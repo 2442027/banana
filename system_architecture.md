@@ -28,6 +28,7 @@ graph TD
 
     style Flask fill:#f9f,stroke:#333
     style DB fill:#ff9,stroke:#333
+```
 
 ## 非機能要件 (Non-functional Requirements)
 - **Performance:** 検索結果は1秒以内に表示すること。
