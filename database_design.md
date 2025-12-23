@@ -1,29 +1,35 @@
 # データベース設計書 (ゴルフクラブ専門店)
 
-## [cite_start]1. ER図・テーブル定義 [cite: 19, 253]
+## 1. テーブル定義・ER図
 正規化を行い、メーカー(Brands)とカテゴリ(Categories)を分離しました。
 
-### Clubs (商品テーブル)
-- **id**: INT, PK, Auto Increment
-- **name**: VARCHAR(100) (商品名)
-- **price**: INT
-- [cite_start]**stock_quantity**: INT (Check >= 0) ※在庫は0以上 [cite: 251]
-- **brand_id**: INT, FK (Brandsテーブル参照)
-- **category_id**: INT, FK (Categoriesテーブル参照)
+```mermaid
+erDiagram
+    BRANDS ||--|{ CLUBS : "makes"
+    CATEGORIES ||--|{ CLUBS : "categorizes"
+    CLUBS ||--o{ SALES : "sold as"
 
-### Brands (メーカーテーブル)
-- **id**: INT, PK
-- **name**: VARCHAR(50) (例: TaylorMade)
+    BRANDS {
+        int id PK
+        string name "メーカー名"
+    }
 
-## [cite_start]2. トランザクション設計 [cite: 250]
-購入時は「売上記録」と「在庫減少」を同時に行います。
-1. `BEGIN`
-2. `INSERT INTO sales ...`
-3. `UPDATE clubs SET stock_quantity = stock_quantity - 1 ...`
-4. `COMMIT`
+    CATEGORIES {
+        int id PK
+        string name "種類"
+    }
 
-## [cite_start]3. SQLサンプル (Join/副文) [cite: 251]
-- **Join:** 商品名と一緒にメーカー名を表示する。
-  `SELECT c.name, b.name FROM clubs c JOIN brands b ON c.brand_id = b.id;`
-- **Subquery:** 平均価格以上の商品を探す。
-  `SELECT * FROM clubs WHERE price > (SELECT AVG(price) FROM clubs);`
+    CLUBS {
+        int id PK "主キー"
+        string name "商品名"
+        int price "価格"
+        int stock_quantity "在庫数 (Check >= 0)"
+        int brand_id FK "外部キー"
+        int category_id FK "外部キー"
+    }
+
+    SALES {
+        int id PK
+        int club_id FK
+        timestamp sold_at "販売日時"
+    }
