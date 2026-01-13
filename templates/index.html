@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>ゴルフクラブ在庫管理</title>
+</head>
+<body>
+    <h1>🏌️‍♂️ ゴルフクラブ在庫管理システム</h1>
+
+    <div style="margin-bottom: 20px;">
+        <a href="/add" style="padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px;">
+            📦 新しい商品を登録する
+        </a>
+    </div>
+
+    <h3>📋 在庫一覧</h3>
+    <table border="1" cellpadding="5" style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="background-color: #f2f2f2;">
+                <th>メーカー</th>
+                <th>商品名</th>
+                <th>種類</th>
+                <th>価格</th>
+                <th>在庫</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td>{{ item.maker }}</td>
+                <td>{{ item.name }}</td>
+                <td>{{ item.club_type }}</td>
+                <td>¥{{ item.price }}</td>
+                <td>{{ item.stock }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
