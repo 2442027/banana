@@ -2,31 +2,66 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>条件検索</title>
+    <title>条件検索 - G-Style</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body class="p-4">
+<body class="bg-light p-4">
     <div class="container" style="max-width: 600px;">
-        <h2 class="mb-4">🔍 在庫を検索</h2>
-        <form action="/search" method="post">
-            <div class="mb-3">
-                <label class="form-label">メーカー</label>
-                <select name="maker_id" class="form-select">
-                    <option value="">すべて</option>
-                    {% for m in makers %}
-                    <option value="{{ m.id }}">{{ m.name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
+        <h2 class="mb-4 text-center">🔍 詳細条件検索</h2>
+        <div class="card shadow-sm p-4">
+            <form action="/search" method="post">
+                <div class="mb-3">
+                    <label class="form-label">メーカー</label>
+                    <select name="maker_id" class="form-select">
+                        <option value="">すべて</option>
+                        {% for m in makers %}
+                        <option value="{{ m.id }}">{{ m.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
 
-            <div class="mb-3">
-                <label class="form-label">予算の上限 (円)</label>
-                <input type="number" name="price_max" class="form-control" placeholder="例: 50000">
-            </div>
+                <div class="mb-3">
+                    <label class="form-label">クラブ種別</label>
+                    <select name="club_type" class="form-select">
+                        <option value="">すべて</option>
+                        {% for t in club_types %}
+                        <option value="{{ t.club_type }}">{{ t.club_type }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
 
-            <button type="submit" class="btn btn-primary w-100">検索する</button>
-            <a href="/" class="btn btn-link w-100 mt-2">戻る</a>
-        </form>
+                <div class="mb-3">
+                    <label class="form-label">予算（上限価格）</label>
+                    <div class="input-group">
+                        <input type="number" name="price_max" class="form-control" placeholder="例: 100000">
+                        <span class="input-group-text">円以下</span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">重さ範囲</label>
+                    <div class="d-flex align-items-center gap-2">
+                        <input type="number" name="weight_min" class="form-control" placeholder="最小(g)">
+                        <span>〜</span>
+                        <input type="number" name="weight_max" class="form-control" placeholder="最大(g)">
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">長さ範囲</label>
+                    <div class="d-flex align-items-center gap-2">
+                        <input type="number" step="0.1" name="length_min" class="form-control" placeholder="最小(inc)">
+                        <span>〜</span>
+                        <input type="number" step="0.1" name="length_max" class="form-control" placeholder="最大(inc)">
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2 mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg">この条件で検索する</button>
+                    <a href="/" class="btn btn-link text-secondary">キャンセルして戻る</a>
+                </div>
+            </form>
+        </div>
     </div>
 </body>
 </html>
