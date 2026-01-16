@@ -1,35 +1,39 @@
-# データベース設計書 (ゴルフクラブ専門店)
+# データベース設計書
 
-## 1. テーブル定義・ER図
-正規化を行い、メーカー(Brands)とカテゴリ(Categories)を分離しました。
+以下は `reset_data.sql` に基づくER図です。
 
 ```mermaid
 erDiagram
-    BRANDS ||--|{ CLUBS : "makes"
-    CATEGORIES ||--|{ CLUBS : "categorizes"
-    CLUBS ||--o{ SALES : "sold as"
-
-    BRANDS {
-        int id PK
-        string name "メーカー名"
+    %% 1. メーカーテーブル
+    makers {
+        INTEGER id PK "主キー"
+        TEXT name "メーカー名"
+        TEXT country "国"
     }
 
-    CATEGORIES {
-        int id PK
-        string name "種類"
+    %% 2. 商品テーブル
+    products {
+        INTEGER id PK "主キー"
+        INTEGER maker_id FK "メーカーID"
+        TEXT name "商品名"
+        TEXT club_type "種類"
+        TEXT tag "タグ"
+        TEXT description "説明"
+        TEXT image_file "画像"
     }
 
-    CLUBS {
-        int id PK "主キー"
-        string name "商品名"
-        int price "価格"
-        int stock_quantity "在庫数 (Check >= 0)"
-        int brand_id FK "外部キー"
-        int category_id FK "外部キー"
+    %% 3. 在庫・スペックテーブル
+    inventory {
+        INTEGER id PK "主キー"
+        INTEGER product_id FK "商品ID"
+        TEXT flex "硬さ"
+        INTEGER price "価格"
+        INTEGER weight "重さ"
+        REAL length "長さ"
+        INTEGER stock "在庫数"
     }
 
-    SALES {
-        int id PK
-        int club_id FK
-        timestamp sold_at "販売日時"
-    }
+    %% 関係線
+    makers ||--|{ products : "1:N"
+    products ||--|{ inventory : "1:N"
+```
