@@ -37,10 +37,14 @@
         <div class="inventory-grid">
             {% for item in items %}
             <a href="{{ url_for('detail', id=item.id) }}" class="product-card">
-                <div class="product-image-container">
+                <div class="product-image-container position-relative">
                     <img src="{{ url_for('static', filename='images/' + (item.image_file or 'noimage.jpg')) }}" 
                          alt="{{ item.name }}"
                          onerror="this.src='{{ url_for('static', filename='images/noimage.jpg') }}';">
+                    
+                    {% if item.tag %}
+                    <span class="badge bg-success position-absolute top-0 end-0 m-2 shadow-sm">{{ item.tag }}</span>
+                    {% endif %}
                 </div>
                 <div class="product-info">
                     <div class="d-flex justify-content-between align-items-start mb-1">
@@ -70,16 +74,11 @@
         <div class="modal-dialog modal-sm modal-dialog-centered">
             <div class="modal-content">
                 <form action="{{ url_for('login') }}" method="post">
-                    <div class="modal-header">
-                        <h5 class="modal-title">管理者認証</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
+                    <div class="modal-header"><h5>管理者認証</h5></div>
                     <div class="modal-body">
                         <input type="password" name="password" class="form-control" placeholder="Password" required autofocus>
                     </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary w-100">ログイン</button>
-                    </div>
+                    <div class="modal-footer"><button type="submit" class="btn btn-primary w-100">ログイン</button></div>
                 </form>
             </div>
         </div>

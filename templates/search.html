@@ -31,34 +31,31 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">予算（上限価格）</label>
-                    <div class="input-group">
-                        <input type="number" name="price_max" class="form-control" placeholder="例: 100000">
-                        <span class="input-group-text">円以下</span>
-                    </div>
+                    <label class="form-label">おすすめタグ</label>
+                    <select name="tag" class="form-select">
+                        <option value="">指定なし</option>
+                        {% for t in tags %}
+                        <option value="{{ t.tag }}">{{ t.tag }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">重さ範囲</label>
-                    <div class="d-flex align-items-center gap-2">
-                        <input type="number" name="weight_min" class="form-control" placeholder="最小(g)">
-                        <span>〜</span>
-                        <input type="number" name="weight_max" class="form-control" placeholder="最大(g)">
-                    </div>
+                    <label class="form-label">予算（上限）</label>
+                    <div class="input-group"><input type="number" name="price_max" class="form-control"><span class="input-group-text">円以下</span></div>
                 </div>
-
                 <div class="mb-3">
-                    <label class="form-label">長さ範囲</label>
-                    <div class="d-flex align-items-center gap-2">
-                        <input type="number" step="0.1" name="length_min" class="form-control" placeholder="最小(inc)">
-                        <span>〜</span>
-                        <input type="number" step="0.1" name="length_max" class="form-control" placeholder="最大(inc)">
-                    </div>
+                    <label class="form-label">重さ範囲(g)</label>
+                    <div class="d-flex gap-2"><input type="number" name="weight_min" class="form-control" placeholder="最小"><input type="number" name="weight_max" class="form-control" placeholder="最大"></div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">長さ範囲(inc)</label>
+                    <div class="d-flex gap-2"><input type="number" step="0.1" name="length_min" class="form-control" placeholder="最小"><input type="number" step="0.1" name="length_max" class="form-control" placeholder="最大"></div>
                 </div>
 
                 <div class="d-grid gap-2 mt-4">
-                    <button type="submit" class="btn btn-primary btn-lg">この条件で検索する</button>
-                    <a href="/" class="btn btn-link text-secondary">キャンセルして戻る</a>
+                    <button type="submit" class="btn btn-primary btn-lg">検索する</button>
+                    <a href="/" class="btn btn-link text-secondary">戻る</a>
                 </div>
             </form>
         </div>

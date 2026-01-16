@@ -2,13 +2,12 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>商品情報の編集 - G-Style</title>
+    <title>編集 - G-Style</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="bg-light p-4">
     <div class="container" style="max-width: 900px;">
-        <h2 class="mb-4 text-center">📝 商品・在庫情報の編集</h2>
-        
+        <h2 class="mb-4 text-center">📝 情報編集</h2>
         <form action="/edit/{{ item.id }}" method="post">
             <div class="row">
                 <div class="col-md-5">
@@ -16,9 +15,9 @@
                         <h5 class="border-bottom pb-2 mb-3">基本情報</h5>
                         <div class="mb-3">
                             <label class="form-label">メーカー</label>
-                            <select name="maker_id" class="form-select" required>
+                            <select name="maker_id" class="form-select">
                                 {% for m in makers %}
-                                    <option value="{{ m.id }}" {% if m.id == item.maker_id %}selected{% endif %}>{{ m.name }}</option>
+                                <option value="{{ m.id }}" {% if m.id == item.maker_id %}selected{% endif %}>{{ m.name }}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -30,6 +29,19 @@
                             <label class="form-label">クラブ種別</label>
                             <input type="text" name="club_type" class="form-control" value="{{ item.club_type }}" required>
                         </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">おすすめタグ</label>
+                            <select name="tag" class="form-select">
+                                <option value="">なし</option>
+                                <option value="初心者おすすめ" {% if item.tag == '初心者おすすめ' %}selected{% endif %}>初心者おすすめ</option>
+                                <option value="中級者向け" {% if item.tag == '中級者向け' %}selected{% endif %}>中級者向け</option>
+                                <option value="アスリート向け" {% if item.tag == 'アスリート向け' %}selected{% endif %}>アスリート向け</option>
+                                <option value="全レベル対応" {% if item.tag == '全レベル対応' %}selected{% endif %}>全レベル対応</option>
+                                <option value="レディース" {% if item.tag == 'レディース' %}selected{% endif %}>レディース</option>
+                            </select>
+                        </div>
+
                         <div class="mb-3">
                             <label class="form-label">商品説明</label>
                             <textarea name="description" class="form-control" rows="3">{{ item.description }}</textarea>
@@ -43,17 +55,11 @@
 
                 <div class="col-md-7">
                     <div class="card shadow-sm p-4 mb-4">
-                        <h5 class="border-bottom pb-2 mb-3">スペック・価格・在庫</h5>
+                        <h5 class="border-bottom pb-2 mb-3">スペック・在庫</h5>
                         <div class="table-responsive">
                             <table class="table table-sm align-middle">
                                 <thead class="table-light">
-                                    <tr style="font-size: 0.85rem;">
-                                        <th>Flex</th>
-                                        <th>重さ(g)</th>
-                                        <th>長さ(inc)</th>
-                                        <th>価格(円)</th>
-                                        <th>在庫数</th>
-                                    </tr>
+                                    <tr><th>Flex</th><th>重さ</th><th>長さ</th><th>価格</th><th>在庫</th></tr>
                                 </thead>
                                 <tbody>
                                     {% for spec in specs %}
@@ -69,14 +75,12 @@
                                 </tbody>
                             </table>
                         </div>
-                        <p class="text-muted small mt-2">※在庫数が5個以下になると自動で「残りわずか」警告が表示されます。</p>
                     </div>
                 </div>
             </div>
-
-            <div class="d-flex justify-content-center gap-3 mt-2">
-                <a href="/detail/{{ item.id }}" class="btn btn-outline-secondary px-5">キャンセル</a>
-                <button type="submit" class="btn btn-warning px-5 fw-bold">変更をすべて保存する</button>
+            <div class="d-flex justify-content-center gap-3">
+                <a href="/detail/{{ item.id }}" class="btn btn-secondary px-5">キャンセル</a>
+                <button type="submit" class="btn btn-warning px-5 fw-bold">保存</button>
             </div>
         </form>
     </div>

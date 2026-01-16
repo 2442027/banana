@@ -13,13 +13,12 @@
                 
                 <div class="mb-3">
                     <label class="form-label">メーカー名 <span class="badge bg-danger">必須</span></label>
-                    <input type="text" name="maker_name" class="form-control" placeholder="例: Taylormade, Callaway" required list="maker_list">
-                    <div class="form-text">新しいメーカー名を入力すると自動で登録されます。</div>
+                    <input type="text" name="maker_name" class="form-control" required>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">商品名（モデル名） <span class="badge bg-danger">必須</span></label>
-                    <input type="text" name="name" class="form-control" placeholder="例: Qi10 MAX" required>
+                    <label class="form-label">商品名 <span class="badge bg-danger">必須</span></label>
+                    <input type="text" name="name" class="form-control" required>
                 </div>
 
                 <div class="mb-3">
@@ -36,19 +35,30 @@
                 </div>
 
                 <div class="mb-3">
+                    <label class="form-label">おすすめタグ <span class="badge bg-secondary">任意</span></label>
+                    <select name="tag" class="form-select">
+                        <option value="">なし</option>
+                        <option value="初心者おすすめ">初心者おすすめ</option>
+                        <option value="中級者向け">中級者向け</option>
+                        <option value="アスリート向け">アスリート向け</option>
+                        <option value="全レベル対応">全レベル対応</option>
+                        <option value="レディース">レディース</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
                     <label class="form-label">商品説明 <span class="badge bg-danger">必須</span></label>
-                    <textarea name="description" class="form-control" rows="3" placeholder="商品の特徴などを入力" required></textarea>
+                    <textarea name="description" class="form-control" rows="3" required></textarea>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">商品画像 <span class="badge bg-danger">必須</span></label>
                     <input type="file" name="image_file" class="form-control" accept="image/*" required>
-                    <div class="form-text">jpg, pngなどの画像ファイルを選択してください。</div>
                 </div>
 
                 <div class="d-grid gap-2 mt-4">
-                    <button type="submit" class="btn btn-success btn-lg">商品を登録する</button>
-                    <a href="/" class="btn btn-link text-secondary">キャンセルして戻る</a>
+                    <button type="submit" class="btn btn-success btn-lg">登録する</button>
+                    <a href="/" class="btn btn-link text-secondary">戻る</a>
                 </div>
             </form>
         </div>
