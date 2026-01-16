@@ -6,8 +6,51 @@
     <title>G-Style在庫管理システム</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* 比較バーのスタイル（画面下に固定） */
+        .compare-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(33, 37, 41, 0.95);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            transform: translateY(100%);
+            transition: transform 0.3s ease-in-out;
+            z-index: 1000;
+        }
+        .compare-bar.active {
+            transform: translateY(0);
+        }
+        
+        /* ★重要：チェックボックスは最初は消しておく */
+        .select-checkbox {
+            display: none; /* デフォルト非表示 */
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 10;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            box-shadow: 0 0 5px rgba(0,0,0,0.3);
+        }
+
+        /* ★比較モードONの時だけ表示する */
+        .comparison-mode .select-checkbox {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
 </head>
-<body class="p-4 bg-light">
+<body class="p-4 bg-light" style="padding-bottom: 80px;">
     <div class="container">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div class="d-flex align-items-center">
@@ -22,6 +65,7 @@
                 {% if is_manager %}
                     <a href="/add" class="btn btn-success me-2">📦 新規登録</a>
                 {% endif %}
+                <button type="button" class="btn btn-warning me-2 fw-bold" onclick="toggleMode()">⚖️ 比較モード</button>
                 <a href="/search" class="btn btn-primary">🔍 詳細条件検索</a>
             </div>
         </div>
@@ -58,41 +102,51 @@
             </form>
         </div>
 
-        {% if items %}
-        <div class="inventory-grid">
-            {% for item in items %}
-            <a href="{{ url_for('detail', id=item.id) }}" class="product-card">
-                <div class="product-image-container position-relative">
-                    <img src="{{ url_for('static', filename='images/' + (item.image_file or 'noimage.jpg')) }}" 
-                         alt="{{ item.name }}"
-                         onerror="this.src='{{ url_for('static', filename='images/noimage.jpg') }}';">
+        <form action="/compare" method="get" id="compareForm">
+            {% if items %}
+            <div class="inventory-grid">
+                {% for item in items %}
+                <div class="position-relative">
+                    <input type="checkbox" name="product_ids" value="{{ item.id }}" class="form-check-input select-checkbox" onchange="checkSelections()">
                     
-                    {% if item.tag %}
-                    <span class="badge bg-success position-absolute top-0 end-0 m-2 shadow-sm">{{ item.tag }}</span>
-                    {% endif %}
-                </div>
-                <div class="product-info">
-                    <div class="d-flex justify-content-between align-items-start mb-1">
-                        <div class="text-muted" style="font-size: 0.75rem;">{{ item.maker_name }}</div>
-                        {% if item.min_stock is not none %}
-                            {% if item.min_stock <= 0 %}
-                                <span class="badge bg-danger" style="font-size: 0.65rem;">在庫切れ</span>
-                            {% elif item.min_stock <= 5 %}
-                                <span class="badge bg-warning text-dark" style="font-size: 0.65rem;">残りわずか</span>
+                    <a href="{{ url_for('detail', id=item.id) }}" class="product-card">
+                        <div class="product-image-container position-relative">
+                            <img src="{{ url_for('static', filename='images/' + (item.image_file or 'noimage.jpg')) }}" 
+                                 alt="{{ item.name }}"
+                                 onerror="this.src='{{ url_for('static', filename='images/noimage.jpg') }}';">
+                            {% if item.tag %}
+                            <span class="badge bg-success position-absolute top-0 end-0 m-2 shadow-sm">{{ item.tag }}</span>
                             {% endif %}
-                        {% endif %}
-                    </div>
-                    <h3 class="product-name">{{ item.name }}</h3>
-                    <div class="product-price">
-                        {% if item.min_price %}¥{{ "{:,}".format(item.min_price) }}〜{% else %}価格未定{% endif %}
-                    </div>
+                        </div>
+                        <div class="product-info">
+                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                <div class="text-muted" style="font-size: 0.75rem;">{{ item.maker_name }}</div>
+                                {% if item.min_stock is not none and item.min_stock <= 5 %}
+                                    <span class="badge bg-warning text-dark" style="font-size: 0.65rem;">残りわずか</span>
+                                {% endif %}
+                            </div>
+                            <h3 class="product-name">{{ item.name }}</h3>
+                            <div class="product-price">
+                                {% if item.min_price %}¥{{ "{:,}".format(item.min_price) }}〜{% else %}価格未定{% endif %}
+                            </div>
+                        </div>
+                    </a>
                 </div>
-            </a>
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="alert alert-warning text-center py-5">該当する商品は見つかりませんでした。</div>
-        {% endif %}
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="alert alert-warning text-center py-5">該当する商品は見つかりませんでした。</div>
+            {% endif %}
+
+            <div class="compare-bar shadow-lg" id="compareBar">
+                <div class="container d-flex justify-content-between align-items-center">
+                    <span class="fw-bold fs-5">チェックした商品を比較します</span>
+                    <button type="submit" class="btn btn-warning btn-lg fw-bold px-5 text-dark">
+                        ⚖️ スペック比較を実行
+                    </button>
+                </div>
+            </div>
+        </form>
     </div>
 
     <div class="modal fade" id="loginModal" tabindex="-1">
@@ -108,6 +162,33 @@
             </div>
         </div>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 1. 比較モード切替
+        function toggleMode() {
+            // bodyにクラスをつけたり外したりする
+            document.body.classList.toggle('comparison-mode');
+            
+            // モードをOFFにしたときは、選択状態もリセットする
+            if (!document.body.classList.contains('comparison-mode')) {
+                document.querySelectorAll('.select-checkbox').forEach(cb => cb.checked = false);
+                document.getElementById('compareBar').classList.remove('active');
+            }
+        }
+
+        // 2. チェックボックスの監視
+        function checkSelections() {
+            const checkboxes = document.querySelectorAll('.select-checkbox:checked');
+            const bar = document.getElementById('compareBar');
+            
+            // 1つでも選ばれていればバーを出す
+            if (checkboxes.length > 0) {
+                bar.classList.add('active');
+            } else {
+                bar.classList.remove('active');
+            }
+        }
+    </script>
 </body>
 </html>
