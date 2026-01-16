@@ -26,12 +26,37 @@
             </div>
         </div>
 
-        {% if is_search %}
-        <div class="alert alert-secondary d-flex justify-content-between align-items-center py-2 px-3 mb-4 shadow-sm">
-            <span class="fw-bold">🔍 検索結果を表示中</span>
-            <a href="/" class="btn btn-sm btn-dark">全商品一覧に戻る</a>
+        <div class="d-flex justify-content-between align-items-center mb-4 p-2 bg-white rounded shadow-sm border">
+            <div class="d-flex align-items-center">
+                {% if is_search %}
+                    <span class="badge bg-secondary me-2">絞り込み中</span>
+                {% else %}
+                    <span class="badge bg-light text-dark border me-2">全商品</span>
+                {% endif %}
+                <span class="fw-bold">{{ items|length }}件</span>を表示
+            </div>
+
+            <form action="/search" method="post" class="d-flex align-items-center gap-2">
+                <input type="hidden" name="maker_id" value="{{ search_params.maker_id or '' }}">
+                <input type="hidden" name="club_type" value="{{ search_params.club_type or '' }}">
+                <input type="hidden" name="tag" value="{{ search_params.tag or '' }}">
+                <input type="hidden" name="price_max" value="{{ search_params.price_max or '' }}">
+                <input type="hidden" name="weight_min" value="{{ search_params.weight_min or '' }}">
+                <input type="hidden" name="weight_max" value="{{ search_params.weight_max or '' }}">
+                <input type="hidden" name="length_min" value="{{ search_params.length_min or '' }}">
+                <input type="hidden" name="length_max" value="{{ search_params.length_max or '' }}">
+
+                <select name="sort_order" class="form-select form-select-sm" style="width: auto;" onchange="this.form.submit()">
+                    <option value="new_desc" {% if search_params.sort_order == 'new_desc' %}selected{% endif %}>新着順</option>
+                    <option value="price_asc" {% if search_params.sort_order == 'price_asc' %}selected{% endif %}>価格が安い順</option>
+                    <option value="price_desc" {% if search_params.sort_order == 'price_desc' %}selected{% endif %}>価格が高い順</option>
+                </select>
+                
+                {% if is_search %}
+                    <a href="/" class="btn btn-sm btn-outline-dark">✕ 解除</a>
+                {% endif %}
+            </form>
         </div>
-        {% endif %}
 
         {% if items %}
         <div class="inventory-grid">

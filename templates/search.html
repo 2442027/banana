@@ -10,6 +10,18 @@
         <h2 class="mb-4 text-center">🔍 詳細条件検索</h2>
         <div class="card shadow-sm p-4">
             <form action="/search" method="post">
+                
+                <div class="mb-3">
+                    <label class="form-label fw-bold">並び順</label>
+                    <select name="sort_order" class="form-select bg-light">
+                        <option value="new_desc">新着順</option>
+                        <option value="price_asc">価格が安い順</option>
+                        <option value="price_desc">価格が高い順</option>
+                    </select>
+                </div>
+                
+                <hr class="my-4">
+
                 <div class="mb-3">
                     <label class="form-label">メーカー</label>
                     <select name="maker_id" class="form-select">
