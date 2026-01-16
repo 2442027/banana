@@ -204,15 +204,73 @@ def edit(id):
     conn.close()
     return render_template('edit.html', item=item, makers=makers, specs=specs)
 
+# ---------------------------------------------------------
+# 削除機能 (売上履歴の削除 ＆ メーカー自動削除付き)
+# ---------------------------------------------------------
 @app.route('/delete/<int:id>', methods=['POST'])
 def delete(id):
     if not session.get('is_manager'): return redirect(url_for('index'))
+    
     conn = get_db_connection()
-    conn.execute('DELETE FROM products WHERE id = ?', (id,))
-    conn.execute('DELETE FROM inventory WHERE product_id = ?', (id,))
-    conn.commit(); conn.close()
-    return redirect(url_for('index'))
+    
+    # 1. 削除する前に、その商品の「メーカーID」を調べておく
+    product = conn.execute('SELECT maker_id FROM products WHERE id = ?', (id,)).fetchone()
+    
+    if product:
+        maker_id = product['maker_id']
 
+        # 2. ★重要：まずは「売上履歴」を削除する
+        # (これをしないと、在庫データが削除できません)
+        conn.execute('DELETE FROM sales WHERE inventory_id IN (SELECT id FROM inventory WHERE product_id = ?)', (id,))
+
+        # 3. 次に「在庫データ」を削除
+        conn.execute('DELETE FROM inventory WHERE product_id = ?', (id,))
+
+        # 4. 最後に「商品データ」を削除
+        conn.execute('DELETE FROM products WHERE id = ?', (id,))
+        
+        # 5. 「このメーカーの商品はあと何個残ってる？」と数える
+        count = conn.execute('SELECT COUNT(*) FROM products WHERE maker_id = ?', (maker_id,)).fetchone()[0]
+        
+        # もし0個になったら、メーカー名もリストから消す
+        if count == 0:
+            conn.execute('DELETE FROM makers WHERE id = ?', (maker_id,)).fetchone()
+            print(f"🗑️ 商品がなくなったため、メーカー(ID:{maker_id})も削除しました。")
+
+    conn.commit()
+    conn.close()
+    
+    return redirect(url_for('index'))
+# ---------------------------------------------------------
+# スペック追加機能 (★NEW)
+# ---------------------------------------------------------
+@app.route('/add_spec/<int:product_id>', methods=['POST'])
+def add_spec(product_id):
+    if not session.get('is_manager'): return redirect(url_for('index'))
+    
+    conn = get_db_connection()
+    
+    # フォームから値を取得
+    flex = request.form.get('flex')
+    weight = request.form.get('weight')
+    length = request.form.get('length')
+    price = request.form.get('price')
+    stock = request.form.get('stock')
+    
+    # 空欄対策（数値系は空なら0にする）
+    if not price: price = 0
+    if not weight: weight = 0
+    if not stock: stock = 0
+    
+    # データベースに追加
+    conn.execute('INSERT INTO inventory (product_id, flex, weight, length, price, stock) VALUES (?, ?, ?, ?, ?, ?)',
+                 (product_id, flex, weight, length, price, stock))
+    
+    conn.commit()
+    conn.close()
+    
+    # 編集画面に戻る
+    return redirect(url_for('edit', id=product_id))
 # ---------------------------------------------------------
 # 6. 売上登録機能 (★NEW)
 # ---------------------------------------------------------

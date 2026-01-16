@@ -2,87 +2,155 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>編集 - G-Style</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品編集 - {{ item.name }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="bg-light p-4">
-    <div class="container" style="max-width: 900px;">
-        <h2 class="mb-4 text-center">📝 情報編集</h2>
-        <form action="/edit/{{ item.id }}" method="post">
-            <div class="row">
-                <div class="col-md-5">
-                    <div class="card shadow-sm p-4 mb-4">
-                        <h5 class="border-bottom pb-2 mb-3">基本情報</h5>
-                        <div class="mb-3">
-                            <label class="form-label">メーカー</label>
-                            <select name="maker_id" class="form-select">
-                                {% for m in makers %}
-                                <option value="{{ m.id }}" {% if m.id == item.maker_id %}selected{% endif %}>{{ m.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">商品名</label>
-                            <input type="text" name="name" class="form-control" value="{{ item.name }}" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">クラブ種別</label>
-                            <input type="text" name="club_type" class="form-control" value="{{ item.club_type }}" required>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">おすすめタグ</label>
-                            <select name="tag" class="form-select">
-                                <option value="">なし</option>
-                                <option value="初心者おすすめ" {% if item.tag == '初心者おすすめ' %}selected{% endif %}>初心者おすすめ</option>
-                                <option value="中級者向け" {% if item.tag == '中級者向け' %}selected{% endif %}>中級者向け</option>
-                                <option value="アスリート向け" {% if item.tag == 'アスリート向け' %}selected{% endif %}>アスリート向け</option>
-                                <option value="全レベル対応" {% if item.tag == '全レベル対応' %}selected{% endif %}>全レベル対応</option>
-                                <option value="レディース" {% if item.tag == 'レディース' %}selected{% endif %}>レディース</option>
-                            </select>
-                        </div>
+    <div class="container" style="max-width: 800px;">
+        
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>✏️ 商品情報の編集</h2>
+            <a href="{{ url_for('detail', id=item.id) }}" class="btn btn-outline-secondary">キャンセルして戻る</a>
+        </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">商品説明</label>
-                            <textarea name="description" class="form-control" rows="3">{{ item.description }}</textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">画像ファイル名</label>
-                            <input type="text" name="image_file" class="form-control" value="{{ item.image_file }}">
-                        </div>
-                    </div>
+        <form action="{{ url_for('edit', id=item.id) }}" method="post" enctype="multipart/form-data" class="card p-4 shadow-sm mb-4">
+            
+            <h4 class="mb-3 border-bottom pb-2">基本情報</h4>
+            
+            <div class="mb-3">
+                <label class="form-label">メーカー</label>
+                <select name="maker_id" class="form-select">
+                    {% for m in makers %}
+                    <option value="{{ m.id }}" {% if item.maker_id == m.id %}selected{% endif %}>{{ m.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">商品名</label>
+                <input type="text" name="name" class="form-control" value="{{ item.name }}" required>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col">
+                    <label class="form-label">クラブ種別</label>
+                    <input type="text" name="club_type" class="form-control" value="{{ item.club_type }}" list="typeOptions">
+                    <datalist id="typeOptions">
+                        <option value="ドライバー">
+                        <option value="フェアウェイウッド">
+                        <option value="ユーティリティ">
+                        <option value="アイアン">
+                        <option value="ウェッジ">
+                        <option value="パター">
+                    </datalist>
                 </div>
-
-                <div class="col-md-7">
-                    <div class="card shadow-sm p-4 mb-4">
-                        <h5 class="border-bottom pb-2 mb-3">スペック・在庫</h5>
-                        <div class="table-responsive">
-                            <table class="table table-sm align-middle">
-                                <thead class="table-light">
-                                    <tr><th>Flex</th><th>重さ</th><th>長さ</th><th>価格</th><th>在庫</th></tr>
-                                </thead>
-                                <tbody>
-                                    {% for spec in specs %}
-                                    <tr>
-                                        <input type="hidden" name="spec_id" value="{{ spec.id }}">
-                                        <td><input type="text" name="flex_{{ spec.id }}" class="form-control form-control-sm" value="{{ spec.flex }}"></td>
-                                        <td><input type="number" name="weight_{{ spec.id }}" class="form-control form-control-sm" value="{{ spec.weight }}"></td>
-                                        <td><input type="number" step="0.1" name="length_{{ spec.id }}" class="form-control form-control-sm" value="{{ spec.length }}"></td>
-                                        <td><input type="number" name="price_{{ spec.id }}" class="form-control form-control-sm" value="{{ spec.price }}"></td>
-                                        <td><input type="number" name="stock_{{ spec.id }}" class="form-control form-control-sm" value="{{ spec.stock }}"></td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                <div class="col">
+                    <label class="form-label">タグ</label>
+                    <input type="text" name="tag" class="form-control" value="{{ item.tag or '' }}">
                 </div>
             </div>
-            <div class="d-flex justify-content-center gap-3">
-                <a href="/detail/{{ item.id }}" class="btn btn-secondary px-5">キャンセル</a>
-                <button type="submit" class="btn btn-warning px-5 fw-bold">保存</button>
+
+            <div class="mb-3">
+                <label class="form-label">商品説明</label>
+                <textarea name="description" class="form-control" rows="3">{{ item.description }}</textarea>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">画像ファイル</label>
+                <input type="file" name="image_file" class="form-control">
+                <input type="hidden" name="image_file" value="{{ item.image_file or '' }}">
+                {% if item.image_file %}
+                <div class="mt-2">
+                    <img src="{{ url_for('static', filename='images/' + item.image_file) }}" height="50">
+                    <span class="text-muted small">現在の画像: {{ item.image_file }}</span>
+                </div>
+                {% endif %}
+            </div>
+
+            {% if specs %}
+                <h4 class="mb-3 border-bottom pb-2 mt-4">既存スペックの編集</h4>
+                {% for s in specs %}
+                <div class="card bg-light mb-3 p-3">
+                    <input type="hidden" name="spec_id" value="{{ s.id }}">
+                    <div class="row g-2 align-items-center">
+                        <div class="col-md-2">
+                            <label class="small text-muted">Flex</label>
+                            <input type="text" name="flex_{{ s.id }}" class="form-control form-control-sm text-center fw-bold" value="{{ s.flex }}">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="small text-muted">重さ(g)</label>
+                            <input type="number" name="weight_{{ s.id }}" class="form-control form-control-sm" value="{{ s.weight }}">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="small text-muted">長さ(inc)</label>
+                            <input type="number" step="0.25" name="length_{{ s.id }}" class="form-control form-control-sm" value="{{ s.length }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="small text-muted">価格(円)</label>
+                            <input type="number" name="price_{{ s.id }}" class="form-control form-control-sm" value="{{ s.price }}">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="small text-muted">在庫数</label>
+                            <input type="number" name="stock_{{ s.id }}" class="form-control form-control-sm bg-white border-warning" value="{{ s.stock }}">
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="alert alert-warning mt-4">
+                    ⚠️ 在庫データ（スペック）が登録されていません。<br>
+                    下のフォームから、価格やスペックを追加してください。
+                </div>
+            {% endif %}
+
+            <div class="d-grid gap-2 mt-4">
+                <button type="submit" class="btn btn-primary fw-bold">変更を保存する</button>
             </div>
         </form>
+
+        <form action="{{ url_for('add_spec', product_id=item.id) }}" method="post" class="card p-4 shadow-sm mb-5 border-success">
+            <h5 class="text-success mb-3">➕ 新しいスペックを追加</h5>
+            <div class="row g-2 align-items-end">
+                <div class="col-md-2">
+                    <label class="small text-muted">Flex</label>
+                    <input type="text" name="flex" class="form-control" placeholder="S" required>
+                </div>
+                <div class="col-md-2">
+                    <label class="small text-muted">重さ(g)</label>
+                    <input type="number" name="weight" class="form-control" placeholder="300">
+                </div>
+                <div class="col-md-2">
+                    <label class="small text-muted">長さ</label>
+                    <input type="number" step="0.25" name="length" class="form-control" placeholder="45.5">
+                </div>
+                <div class="col-md-3">
+                    <label class="small text-muted">価格(円)</label>
+                    <input type="number" name="price" class="form-control" placeholder="50000" required>
+                </div>
+                <div class="col-md-2">
+                    <label class="small text-muted">在庫数</label>
+                    <input type="number" name="stock" class="form-control" placeholder="10" value="10">
+                </div>
+                <div class="col-md-1">
+                    <button type="submit" class="btn btn-success w-100">追加</button>
+                </div>
+            </div>
+        </form>
+
+        <div class="card border-danger mt-5">
+            <div class="card-body d-flex justify-content-between align-items-center">
+                <div class="text-danger">
+                    <strong>⚠️ 商品の削除</strong><br>
+                    <small>この操作は取り消せません。商品データと在庫データが全て消えます。</small>
+                </div>
+                <form action="{{ url_for('delete', id=item.id) }}" method="post" onsubmit="return confirm('本当に「{{ item.name }}」を削除しますか？\nこの操作は元に戻せません！');">
+                    <button type="submit" class="btn btn-danger">🗑️ この商品を削除</button>
+                </form>
+            </div>
+        </div>
+
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
